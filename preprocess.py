@@ -4,33 +4,18 @@ from concurrent.futures import ProcessPoolExecutor
 
 from feature import extract_features
 from data_split import create_splits, load_metadata, get_audio_path
+from tqdm import tqdm
 
-try:
-    from tqdm import tqdm
-except ImportError:
-    def tqdm(iterable, total=None, **kwargs):
-        total_len = total if total is not None else len(iterable)
-        for i, val in enumerate(iterable):
-            if i % 100 == 0 or i == total_len - 1:
-                print(f"Progress: {i + 1}/{total_len}")
-            yield val
 
 
 def process_file(args):
-    """
-    Process a single audio file.
-    Returns:
-        (row_idx, features, label)
-    """
     row_idx, row, dataset_path = args
 
     audio_path = get_audio_path(dataset_path, row)
 
     try:
-        # Feature shape:
-        # (num_frames, feature_dim)
-        features = extract_features(audio_path)
 
+        features = extract_features(audio_path)
         return row_idx, features, row["classID"]
 
     except Exception as e:
@@ -39,11 +24,7 @@ def process_file(args):
 
 
 def preprocess_split(df, dataset_path):
-    """
-    Process all files in a dataframe split.
-    No padding.
-    No truncation.
-    """
+
     tasks = [
         (idx, row, dataset_path)
         for idx, row in df.iterrows()

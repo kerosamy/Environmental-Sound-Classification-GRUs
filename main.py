@@ -26,10 +26,6 @@ FEATURE_CONFIGS = {
     "all": (0, 169)
 }
 
-
-# =========================
-# LOAD DATA
-# =========================
 import numpy as np
 
 def load_data():
@@ -42,16 +38,13 @@ def load_data():
     X_test = np.load("processed_data/test.npz", allow_pickle=True)["X"]
     y_test = np.load("processed_data/test.npz", allow_pickle=True)["y"]
 
-    # ---- FIX: convert to numeric tensor ----
     X_train = np.array(X_train.tolist(), dtype=np.float32)
     X_val   = np.array(X_val.tolist(), dtype=np.float32)
     X_test  = np.array(X_test.tolist(), dtype=np.float32)
 
-    # ---- COMPUTE NORMALIZATION STATS (TRAIN ONLY) ----
     mean = X_train.mean(axis=(0, 1), keepdims=True)
     std  = X_train.std(axis=(0, 1), keepdims=True) + 1e-8
 
-    # ---- APPLY NORMALIZATION ----
     X_train = (X_train - mean) / std
     X_val   = (X_val   - mean) / std
     X_test  = (X_test  - mean) / std
@@ -59,9 +52,6 @@ def load_data():
     return X_train, y_train, X_val, y_val, X_test, y_test
 
 
-# =========================
-# SPLIT FEATURES
-# =========================
 def split_features(X):
     out = {}
     for name, (a, b) in FEATURE_CONFIGS.items():
